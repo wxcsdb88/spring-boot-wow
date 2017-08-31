@@ -1,0 +1,72 @@
+sourceSets {
+    main {
+        resources {
+            srcDirs = ["src/main/resources"]
+        }
+        java {
+            srcDirs = ['src/main/java']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['src/test/java']
+        }
+        resources {
+            srcDirs = ['src/test/resources']
+        }
+    }
+}
+
+eclipse {
+    classpath {
+        containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+        containers('org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8')
+    }
+}
+
+idea {
+    module {
+        inheritOutputDirs = false
+        outputDir = file("${buildDir}/classes/main/")
+//        downloadJavadoc = false
+//        downloadSources = false
+    }
+}
+
+group 'com.futurever'
+// jar包的名字
+archivesBaseName = 'core-pre'
+//buildDir = "target"
+version = '0.0.1'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile(
+            'junit:junit:4.12',
+    )
+
+    ext.jarTree = fileTree(dir: 'libs', include: ['**.jar'])
+    ext.rootProjectLibs = new File(rootProject.rootDir, 'libs').getAbsolutePath()
+    ext.jarTree += fileTree(dir: rootProjectLibs, include: ['**.jar'])
+    compile jarTree
+
+    compile('com.alibaba:fastjson:1.2.37')
+    compile(
+            'com.google.code.gson:gson:2.8.0',
+            'dom4j:dom4j:1.6.1',
+            'joda-time:joda-time:2.2',
+            'commons-codec:commons-codec:1.10',
+    )
+}
+
+// 显示当前项目下所有用于 compile 的 jar.
+task listJars(description: 'Display all compile jars.') << {
+    configurations.compile.each { File file -> println file.name }
+}

@@ -1,0 +1,43 @@
+sourceSets {
+    main {
+        resources {
+            srcDirs = ["src/main/resources"]
+        }
+        java {
+            srcDirs = ['src/main/java']
+        }
+    }
+    test{
+        java {
+            srcDirs = ['src/test/java']
+        }
+        resources {
+            srcDirs = ['src/test/resources']
+        }
+    }
+}
+
+group 'com.futurever'
+version '0.0.2'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile project(":core")
+}
+
+//configurations {
+//    dev
+//}
+//
+//bootRun {
+//    //addResources = true
+//    classpath = sourceSets.main.runtimeClasspath + configurations.dev
+//}
