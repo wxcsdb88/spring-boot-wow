@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.futurever.elm.api.dao.UserMapper">
+    <resultMap id="userMap" type="com.futurever.elm.api.model.User">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="originPassword" column="origin_password" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="age" column="age" jdbcType="TINYINT"/>
+        <result property="locked" column="isLocked" javaType="boolean"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+        <result property="createUserId" column="create_user_id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="createUserName" column="create_user_name" jdbcType="VARCHAR"/>
+
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+        <result property="updateUserId" column="update_user_id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="updateUserName" column="update_user_name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="userDTOMap" type="com.futurever.elm.api.dto.UserDTO">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO elm_user(username, password, origin_password, name, age, isLocked, create_time)
+        VALUES(#{username}, #{password}, #{originPassword}, #{name}, #{age}, #{locked}, #{createTime, jdbcType=TIMESTAMP})
+    </insert>
+
+    <select id="getUserListByUser" resultMap="userDTOMap">
+        SELECT * FROM elm_user
+        <where>
+            <if test="user.id != null">
+                AND id =#{user.id}
+            </if>
+            <if test='user.name != null and ""!=user.name'>
+                AND name like "%"#{user.name}"%"
+            </if>
+        </where>
+    </select>
+
+    <select id="delete" parameterType="long">
+          DELETE FROM elm_user where id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="userDTOMap">
+        SELECT * FROM elm_user
+    </select>
+
+    <select id="getUserById" resultMap="userDTOMap">
+        SELECT * FROM elm_user
+        <where>
+            <if test="user.id != null">
+                AND id =#{user.id}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="getUserByUserName" parameterType="string" resultMap="userMap">
+        SELECT * FROM elm_user where username =#{username}
+    </select>
+
+    <update id="update" parameterType="User">
+        UPDATE elm_user
+        <trim prefix="set" suffixOverrides=",">
+            <if test='password!=null and ""!=password'>password=#{password},</if>
+            <if test='name!=null and ""!=name'>name=#{name},</if>
+            <if test='name!=null and ""!=name'>name=#{name},</if>
+            <if test="age !=null">age=#{age},</if>
+            <if test="updateUserId !=null">update_user_id=#{updateUserId},</if>
+            <if test='updateUserName!=null and ""!=updateUserName'>update_user_name=#{updateUserName},</if>
+        </trim>
+        WHERE id =#{id}
+    </update>
+</mapper>

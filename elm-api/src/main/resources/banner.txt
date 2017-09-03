@@ -1,0 +1,4 @@
+${AnsiColor.BRIGHT_BLUE}
+
+${AnsiColor.BRIGHT_RED}
+:: Spring Boot ::         ${spring-boot.version}${spring-boot.formatted-version}

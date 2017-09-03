@@ -1,0 +1,59 @@
+# 基础参数， 公有的
+
+spring:
+  profiles:
+#    active: dev  # dev 环境
+    active: test # test 环境
+#    active: prod # prod 环境
+  main:
+    banner-mode:  console
+  mvc:
+    throw-exception-if-no-handler-found: true
+  aop:
+    auto: true
+    proxy-target-class: false
+
+  resources:
+    add-mappings: false
+
+  redis:
+    #  数据库索引
+        database: 1
+    #    服务器地址
+        host: 192.168.1.13
+#        host: 192.168.1.14
+#        host: www.wxcsdb88.com
+    #    服务器连接端口
+        port: 6379
+    #    链接密码
+        password:
+    #    链接超时时间（毫秒）
+        timeout: 0
+        jedis:
+          pool:
+            max-active: 24
+            max-wait: 2000
+            # 最大空闲链接
+            max-idle: 8
+            # 最小空闲链接
+            min-idle: 0
+
+
+#BANNER
+#Banner file location.
+banner:
+  location: classpath:banner.txt
+  charset: UTF-8
+
+# tomcat最大线程数，默认为200
+server:
+  tomcat:
+    max-threads:  800
+    # tomcat的URI编码
+    uri-encoding: UTF-8
+#  port: 8443
+#  ssl:
+#    key-store: classpath:keystore.p12
+#    key-store-password: uniapp
+#    key-store-type: PKCS12
+#    key-alias: tomcat

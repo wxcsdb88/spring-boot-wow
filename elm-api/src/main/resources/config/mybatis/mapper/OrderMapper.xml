@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.futurever.elm.api.dao.OrderMapper">
+    <resultMap id="orderMap" type="com.futurever.elm.api.model.Order">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="userId" column="userId" jdbcType="BIGINT"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+        <result property="createUserId" column="create_user_id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="createUserName" column="create_user_name" jdbcType="VARCHAR"/>
+
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date"/>
+        <result property="updateUserId" column="update_user_id" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result property="updateUserName" column="update_user_name" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="orderDTOMap" type="com.futurever.elm.api.dto.OrderDTO">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <!--<result property="description" column="description" jdbcType="VARCHAR"/>-->
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="Order" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO elm_order(username, userId, description, content, create_time, create_user_id, create_user_name)
+        VALUES(#{username}, #{userId}, #{description}, #{content}, #{createTime,  jdbcType=TIMESTAMP}, #{createUserId}, #{createUserName})
+    </insert>
+
+    <select id="getOrderListByUserId" resultMap="orderDTOMap">
+        SELECT * FROM elm_order
+        <where>
+            <if test="userId != null">
+                AND userId =#{userId}
+            </if>
+        </where>
+        order by create_time ASC
+    </select>
+
+    <select id="delete" parameterType="long">
+        DELETE FROM elm_order where id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="orderDTOMap">
+        SELECT * FROM elm_order order by create_time  ASC
+    </select>
+
+    <select id="getOrderById" resultMap="orderDTOMap">
+        SELECT * FROM elm_order
+        <where>
+            <if test="id != null">
+                AND id =#{id}
+            </if>
+        </where>
+    </select>
+
+</mapper>
