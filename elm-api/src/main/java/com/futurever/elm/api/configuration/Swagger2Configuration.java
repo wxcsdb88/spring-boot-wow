@@ -37,23 +37,10 @@ public class Swagger2Configuration {
 
     @Bean
     public Docket buildDocket() {
-//        String defultToken = "token";
-//        ParameterBuilder parameterBuilder = new ParameterBuilder();
-//        parameterBuilder
-//                .parameterType("header")
-//                .name(RequestField.TOKEN)
-//                .defaultValue(defultToken)
-//                .description("auth token")
-//                .modelRef(new ModelRef("string"))
-//                .required(true).build();
-//        List<Parameter> parameters = new ArrayList<Parameter>();
-//        parameters.add(parameterBuilder.build());
-
         return new Docket(DocumentationType.SWAGGER_2)
                 .groupName("controller")
                 .apiInfo(buildApiInfo())
                 .useDefaultResponseMessages(false)
-//                .globalOperationParameters(parameters)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.futurever.elm.api.controller"))//要扫描的API(Controller)基础包
                 .paths(PathSelectors.any())

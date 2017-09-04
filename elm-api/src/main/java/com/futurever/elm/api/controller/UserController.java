@@ -39,9 +39,6 @@ public class UserController {
     @ApiResponses({
             @ApiResponse(code = Response.OK, message = "操作成功"),
     })
-    @ApiImplicitParam(
-            name = "token", value = "用户标识", paramType = "header", required = true, dataTypeClass = String.class
-    )
     @PutMapping(value = "/users", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public ResponseData register(HttpServletRequest request, Model model,

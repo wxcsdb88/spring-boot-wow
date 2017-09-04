@@ -31,10 +31,10 @@ logging:
 spring:
   # 数据库访问配置
   datasource:
-#    url: jdbc:mysql://172.17.7.109:3306/test?serverTimezone=UTC&useSSL=false
+#    url: jdbc:mysql://www.wxcsdb88.com:3306/elm?serverTimezone=UTC&useSSL=false
     url: jdbc:mysql://localhost:3306/elm?serverTimezone=UTC&useSSL=false
-    username: root
-    password: root
+    username: elm
+    password: elm_123456
     driver-class-name: com.mysql.jdbc.Driver
 #    platform: mysql
  # 使用druid
@@ -72,6 +72,29 @@ spring:
 #          slowSqlMillis: 5000
 #    # 合并多个DruidDataSource的监控数据
 #    useGlobalDataSourceStat: true
+  redis:
+        database: 1
+        #    服务器地址
+      # host: 192.168.1.13
+      # host: 192.168.1.14
+#        host: www.wxcsdb88.com
+        host: localhost
+  #      host: 172.17.7.109
+      #   服务器连接端口
+        port: 6379
+        #    链接密码
+        password:
+        #    链接超时时间（毫秒）
+        timeout: 0
+        jedis:
+            pool:
+              max-active: 48
+              # 最大阻塞等待时间（负值表示没有限制）
+              max-wait: 3000
+              # 最大空闲链接
+              max-idle: 8
+              # 最小空闲链接
+              min-idle: 0
 
 mybatis:
   config-location: classpath:config/mybatis/mybatis-config.xml

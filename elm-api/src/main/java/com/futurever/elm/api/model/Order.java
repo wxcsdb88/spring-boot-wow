@@ -6,6 +6,9 @@ package com.futurever.elm.api.model;/**
  * @since 2017-09-03 15:20
  **/
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -16,24 +19,32 @@ import java.util.Date;
  * @author wxcsdb88
  * @since 2017-09-03 15:20
  **/
+@ApiModel
 public class Order implements Serializable {
 
+    @ApiModelProperty(hidden=true)
     private Long id;
     private Long userId;
     private String description;
     private String content;
 
     /*创建者id*/
+    @ApiModelProperty(hidden = true)
     private Long createUserId;
     /*创建者标识*/
+    @ApiModelProperty(hidden = true)
     private String createUserName;
     /*创建时间*/
+    @ApiModelProperty(hidden = true)
     private Date createTime;
     /*更新者id*/
+    @ApiModelProperty(hidden = true)
     private Long updateUserId;
     /*修改时间*/
+    @ApiModelProperty(hidden = true)
     private Date updateTime;
     /*更新者标识*/
+    @ApiModelProperty(hidden = true)
     private String updateUserName;
 
     public Long getId() {

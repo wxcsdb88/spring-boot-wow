@@ -34,11 +34,11 @@ public class MvcConfiguration extends WebMvcConfigurationSupport {
     static {
         ArrayList<String> includeUrls = new ArrayList<>();
         includeUrls.add("/orders/**");
-        includeUrls.add("/users/**");
+//        includeUrls.add("/users/**");
         includeUrlsArray = includeUrls.toArray(new String[0]);
 
         ArrayList<String> excludeUrls = new ArrayList<>();
-        excludeUrls.add("/register");
+        excludeUrls.add("/users");
         excludeUrls.add("/login");
         excludeUrls.add("/logout");
         excludeUrls.add("/api-docs");
@@ -86,9 +86,9 @@ public class MvcConfiguration extends WebMvcConfigurationSupport {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new AuthInterceptor())
-                .addPathPatterns("/**")
-                .excludePathPatterns(excludeUrlsArray)
+//        registry.addInterceptor(new AuthInterceptor())
+//                .addPathPatterns("/**")
+//                .excludePathPatterns(excludeUrlsArray)
         ;
 //        registry.addInterceptor(new ParameterInterceptor()).order(2)
 //                .addPathPatterns(includeUrlsArray)

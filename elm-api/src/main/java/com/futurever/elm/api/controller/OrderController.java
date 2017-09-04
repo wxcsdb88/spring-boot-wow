@@ -65,9 +65,7 @@ public class OrderController {
             @ApiResponse(code = Response.OK, message = "提交订单成功"),
     })
     @ApiImplicitParams(
-            {@ApiImplicitParam(
-                    name = "order", paramType = "body", required = true, dataTypeClass = Order.class
-            ),
+            {
                     @ApiImplicitParam(
                             name = "token", value = "用户标识", paramType = "header", required = true, dataTypeClass = String.class)
             }
@@ -76,7 +74,7 @@ public class OrderController {
     @RequestMapping(value = "/orders", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public ResponseData create(HttpServletRequest request, HttpServletResponse response,
-                               @RequestBody(required = true) Order order
+                             @RequestBody(required = true) Order order
     ) throws Exception {
         if (CommonUtils.isEmpty(order, order.getContent(), order.getUserId())) {
             throw new BusinessException(Response.DEFAULT_ERROR_CODE, "订单，订单用户，订单内容不能为空！");
@@ -84,9 +82,9 @@ public class OrderController {
         ResponseData<Boolean> responseData = new ResponseData<>();
         boolean isOk = orderService.insert(order);
         if (isOk) {
-            responseData.setOK("创建订单成功！");
+            responseData.setOK("创建订单成功！",false);
         } else {
-            responseData.setError("创建订单失败！");
+            responseData.setError("创建订单失败！", true);
         }
         return responseData;
     }

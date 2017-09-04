@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.futurever.core.utils.CommonUtilsTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2017-08-31T16:30:21" hostname="DESKTOP-FJ6ONSC" time="0.001">
+<testsuite name="com.futurever.core.utils.CommonUtilsTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2017-09-03T11:38:11" hostname="DESKTOP-FJ6ONSC" time="0.002">
   <properties/>
   <testcase name="isEmpty1" classname="com.futurever.core.utils.CommonUtilsTest" time="0.001"/>
   <testcase name="isEmpty" classname="com.futurever.core.utils.CommonUtilsTest" time="0.0"/>
