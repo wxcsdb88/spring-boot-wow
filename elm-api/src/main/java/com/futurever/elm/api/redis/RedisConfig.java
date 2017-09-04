@@ -47,13 +47,16 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory jedisConnectionFactory() {
         JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxTotal(maxActive);
         poolConfig.setMaxIdle(maxIdle);
         poolConfig.setMinIdle(minIdle);
+        poolConfig.setMaxWaitMillis(maxWait);
         poolConfig.setTestOnBorrow(true);
         poolConfig.setTestOnReturn(true);
         poolConfig.setTestWhileIdle(true);
         poolConfig.setNumTestsPerEvictionRun(10);
         poolConfig.setTimeBetweenEvictionRunsMillis(60000);
+        poolConfig.setBlockWhenExhausted(true);
 
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setDatabase(database);
