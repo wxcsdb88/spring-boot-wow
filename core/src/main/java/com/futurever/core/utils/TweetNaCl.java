@@ -1297,11 +1297,7 @@ public class TweetNaCl {
     }
 
     private static SecureRandom getStrongCSPRNG() {
-        try {
-            return SecureRandom.getInstanceStrong();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
+        return new SecureRandom();
     }
 
     private static Random prng = getStrongCSPRNG();
