@@ -1,3 +1,9 @@
+def env = System.getProperty("env") ?: "dev"
+//apply from: "profile-${env}.gradle"
+//gradle build -Denv=prod  这样编译的就是prod环境
+
+//gradle build -Denv=dev  这样编译的就是dev环境（注：dev是默认环境，所以如果是dev环境，最后的-Denv=dev也可以省略）
+
 sourceSets {
     main {
         resources {
@@ -59,10 +65,12 @@ dependencies {
 
     compile('com.alibaba:fastjson:1.2.37')
     compile(
+            'org.slf4j:slf4j-api:1.7.25',
             'com.google.code.gson:gson:2.8.0',
             'dom4j:dom4j:1.6.1',
             'joda-time:joda-time:2.2',
             'commons-codec:commons-codec:1.10',
+            'com.google.guava:guava:23.0',
     )
 }
 

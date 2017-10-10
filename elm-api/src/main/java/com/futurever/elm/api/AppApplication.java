@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 /**
  * Created by wxcsdb88 on 2017/8/13 14:35.
  */
-@MapperScan("com.futurever.elm.api.dao")
+@MapperScan("com.futurever.elm.api.mapper")
 @EnableTransactionManagement
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class AppApplication {

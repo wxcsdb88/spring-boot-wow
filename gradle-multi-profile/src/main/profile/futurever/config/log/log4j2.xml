@@ -26,8 +26,7 @@
                 %M : 方法名
                 %l : 输出语句所在的行数, 包括类名、方法名、文件名、行数
              -->
-            <PatternLayout
-                    pattern="%highlight{%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%t] mybatis-sql %throwable - %msg%n}{FATAL=White, ERROR=Red, WARN=Yellow, INFO=Black, DEBUG=Cyan, TRACE=Blue}"/>
+            <PatternLayout pattern="%highlight{%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%t] mybatis-sql %throwable - %msg%n}{FATAL=White, ERROR=Red, WARN=Yellow, INFO=Black, DEBUG=Cyan, TRACE=Blue}"/>
         </Console>
 
         <Console name="Console" target="SYSTEM_OUT">
@@ -36,12 +35,10 @@
             <!--<ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="DENY"/>-->
             <!--<ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>-->
             <!--<PatternLayout pattern="%highlight{%d{yyyy-MM-dd HH:mm:ss.SSS} local test %highlight{%-5level} [%t] %l %throwable - %msg%n}{FATAL=White, ERROR=Bright Red, WARN=Yellow, INFO=Black, DEBUG=Cyan, TRACE=Blue}"/>-->
-            <PatternLayout
-                    pattern="%highlight{%d{yyyy-MM-dd HH:mm:ss.SSS} local test %highlight{%-5level} [%t]\t %C{1.}.%M(%F:%L) %throwable - %msg%n}{FATAL=White, ERROR=Bright Red, WARN=Yellow, INFO=Black, DEBUG=Cyan, TRACE=Blue}"/>
+            <PatternLayout pattern="%highlight{%d{yyyy-MM-dd HH:mm:ss.SSS} spring-wow-futurever %highlight{%-5level} [%t]\t %C{1.}.%M(%F:%L) %throwable - %msg%n}{FATAL=White, ERROR=Bright Red, WARN=Yellow, INFO=Black, DEBUG=Cyan, TRACE=Blue}"/>
         </Console>
 
-        <RollingRandomAccessFile name="INFO" fileName="${LOG_HOME}/${FILE_NAME}-INFO.log"
-                                 filePattern="${LOG_HOME}/${FILE_NAME}_%d{yyyy-MM-dd}_%i.log.gz">
+        <RollingRandomAccessFile name="INFO" fileName="${LOG_HOME}/${FILE_NAME}-INFO.log" filePattern="${LOG_HOME}/${FILE_NAME}_%d{yyyy-MM-dd}_%i.log.gz">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %c [%t] %l %throwable - %msg%xEx%n"/>
             <!--<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%t] %l [local:%X{client} remote:%X{server}] %throwable - %msg%n"/>-->
             <Filters>
@@ -57,11 +54,10 @@
             <DefaultRolloverStrategy max="20"/>
         </RollingRandomAccessFile>
 
-        <RollingRandomAccessFile name="ERROR" fileName="${LOG_HOME}/${FILE_NAME}-ERROR.log"
-                                 filePattern="${LOG_HOME}/${FILE_NAME}-ERROR_%d{yyyy-MM-dd}_%i.log.gz">
+        <RollingRandomAccessFile name="ERROR" fileName="${LOG_HOME}/${FILE_NAME}-ERROR.log" filePattern="${LOG_HOME}/${FILE_NAME}-ERROR_%d{yyyy-MM-dd}_%i.log.gz">
             <Filters>
                 <ThresholdFilter level="fatal" onMatch="DENY" onMismatch="NEUTRAL"/>
-                <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+                <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY" />
             </Filters>
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %c [%t] %l %throwable - %msg%xEx%n"/>
             <Policies>
@@ -71,8 +67,7 @@
             <DefaultRolloverStrategy max="20"/>
         </RollingRandomAccessFile>
 
-        <RollingRandomAccessFile name="FATAL" fileName="${LOG_HOME}/${FILE_NAME}-FATAL.log"
-                                 filePattern="${LOG_HOME}/${FILE_NAME}-FATAL_%d{yyyy-MM-dd}_%i.log.gz">
+        <RollingRandomAccessFile name="FATAL" fileName="${LOG_HOME}/${FILE_NAME}-FATAL.log" filePattern="${LOG_HOME}/${FILE_NAME}-FATAL_%d{yyyy-MM-dd}_%i.log.gz">
             <Filters>
                 <ThresholdFilter level="fatal" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>
@@ -86,8 +81,7 @@
 
 
         <!--全部日志信息:DEBUG及以上级别-->
-        <RollingRandomAccessFile name="ALL" fileName="${LOG_HOME}/${FILE_NAME}-ALL.log"
-                                 filePattern="${LOG_HOME}/${FILE_NAME}-ALL%d{yyyy-MM-dd}_%i.log.gz">
+        <RollingRandomAccessFile name="ALL" fileName="${LOG_HOME}/${FILE_NAME}-ALL.log" filePattern="${LOG_HOME}/${FILE_NAME}-ALL%d{yyyy-MM-dd}_%i.log.gz">
             <Filters>
                 <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="ACCEPT"/>
             </Filters>
@@ -105,16 +99,16 @@
             <!--</DefaultRolloverStrategy>-->
         </RollingRandomAccessFile>
         <!--配置异步写日志-->
-        <Async name="Async">
-            <AppenderRef ref="ALL"/>
-        </Async>
+        <!--<Async name="Async">-->
+            <!--<AppenderRef ref="ALL" />-->
+        <!--</Async>-->
     </Appenders>
 
     <Loggers>
         <!-- db日志记录 -->
         <!--mybatis sql show, level=trace, show result and statement; level=debug show statement-->
-        <Logger name="com.futurever.elm.api.dao" level="trace" additivity="false">
-            <!--<logger name="com.uniledger.contract.mapper" level="debug" additivity="false">-->
+        <Logger name="com.futurever.**.dao" level="trace" additivity="false">
+            <!--<logger name="com.futurever.contract.dao" level="debug" additivity="false">-->
             <appender-ref ref="SQLConsole"/>
             <!--print the sql with level trace and debug-->
             <Appender-Ref ref="ALL"/>
@@ -126,13 +120,15 @@
         </Logger>
         <logger name="org.springframework.web" level="info"/>
         <Logger name="org.apache.http" level="warn"/>
+        <Logger name="com.futurever.*" level="info"/>
+
 
         <!--采用异步输出日志-->
-        <AsyncLogger name="com.futurever.elm.api.*" level="info">
-            <!--写入info级别-->
-            <AppenderRef ref="ALL" level="info"/>
-            <AppenderRef ref="INFO"/>
-        </AsyncLogger>
+        <!--<AsyncLogger name="com.futurever.*" level="info">-->
+            <!--&lt;!&ndash;写入info级别&ndash;&gt;-->
+            <!--<AppenderRef ref="ALL" level="info"/>-->
+            <!--<AppenderRef ref="INFO"/>-->
+        <!--</AsyncLogger>-->
 
         <!--应用默认日志输出及appender，第三方或者额外的输出可以单独指定，此处尽量设置为info或以上级别，输出默认全局日志-->
         <!--<Root level="trace">-->

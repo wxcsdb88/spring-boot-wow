@@ -113,7 +113,7 @@
         <!-- db日志记录 -->
         <!--mybatis sql show, level=trace, show result and statement; level=debug show statement-->
         <Logger name="com.uniledger.app.dao" level="trace" additivity="false">
-            <!--<logger name="com.uniledger.contract.dao" level="debug" additivity="false">-->
+            <!--<logger name="com.uniledger.contract.mapper" level="debug" additivity="false">-->
             <appender-ref ref="SQLConsole"/>
             <!--print the sql with level trace and debug-->
             <Appender-Ref ref="ALL"/>

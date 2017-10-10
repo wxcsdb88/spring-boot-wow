@@ -1,0 +1,100 @@
+
+#BANNER
+#Banner file location.
+banner:
+  location: classpath:banner.txt
+  charset: UTF-8
+
+spring:
+  main:
+    banner-mode: console
+    #off
+  mvc:
+    throw-exception-if-no-handler-found: true
+  aop:
+    auto: true
+    proxy-target-class: false
+  resources:
+    add-mappings: false
+
+  devtools:
+    restart:
+    #热部署生效
+      enabled: true
+#      enabled: false
+    #设置重启的目录
+      additional-paths: gradle-multi-profile/src/main/java
+    #classpath目录下的resources文件夹内容修改不重启
+#      exclude: resources/**
+      trigger-file: classpath:trigger.txt
+  http:
+    encoding:
+      charset: UTF-8
+# # 数据库访问配置
+#  datasource:
+#    url: jdbc:mysql://localhost:3306/new_app?serverTimezone=UTC&useSSL=false&useUnicode=true&characterEncoding=UTF-8
+#    username: root
+#    password: root
+#    driver-class-name: com.mysql.jdbc.Driver
+##    platform: mysql
+# # 使用druid
+#    type: com.alibaba.druid.pool.DruidDataSource
+#    druid:
+#      maxActive: 20
+#      initialSize: 1
+#      maxWait: 60000
+#      minIdle: 1
+#      timeBetweenEvictionRunsMillis: 60000
+#      minEvictableIdleTimeMillis: 300000
+#      validationQuery: SELECT 1 FROM DUAL
+#      testWhileIdle: true
+#      testOnBorrow: false
+#      testOnReturn: false
+#      poolPreparedStatements: true
+#      maxOpenPreparedStatements: 20
+#
+#  redis:
+#      database: 1
+#      #    服务器地址
+#      host: localhost
+#    #   服务器连接端口
+#      port: 6379
+#      #    链接密码
+#      password:
+#      #    链接超时时间（毫秒）
+#      timeout: 0
+#      jedis:
+#          pool:
+#            max-active: 48
+#            # 最大阻塞等待时间（负值表示没有限制）
+#            max-wait: -1
+#            # 最大空闲链接
+#            max-idle: 8
+#            # 最小空闲链接
+#            min-idle: 0
+#
+#mybatis:
+#  config-location: classpath:config/mybatis/mybatis-config.xml
+#  mapperLocations: classpath:config/mybatis/mapper/**/*Mapper.xml
+#  typeAliasesPackage: com.uniledger.**.model
+#  checkConfigLocation: true
+
+# tomcat最大线程数，默认为200
+server:
+  tomcat:
+    max-threads:  800
+    # tomcat的URI编码
+    uri-encoding: UTF-8
+  #  address: localhost
+  session:
+    timeout: 120
+  port: 9081
+
+
+logging:
+  config: classpath:config/log/log4j2.xml
+##  file: logs/spring-boot-logging.log
+#  level:
+#    org.springframework:  WARN
+#    com.uniledger.app:  WARN
+
