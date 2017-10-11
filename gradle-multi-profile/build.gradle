@@ -1,8 +1,38 @@
-//def env = System.getProperty("env") ?: "dev"
-//def env = System.getProperty("env") ?: "prod"
-//def env = System.getProperty("env") ?: "test"
-def env = System.getProperty("env") ?: "futurever"
+/*  请勿随意去掉 groovy 定义的变量， 切换打包版本 请修改 defaultEnv 值即可！gradle -Denv */
+/***************************   请勿修改 下面的值  ******************************/
+def defaultEnv =  System.getProperty("env")
+//println "$defaultEnv"
+
+def currentTime = new Date()
+def currentTimeStr = currentTime.format("yyyyMMddHHmmss")
+/***************************   请勿修改 上面的值  ******************************/
+
+
+//defaultEnv = defaultEnv ?: "dev"
+//defaultEnv = defaultEnv ?: "prod"
+defaultEnv = defaultEnv ?: "test"
+//defaultEnv = defaultEnv ?: "futurever"
+
+/***************************   请勿修改 下面的值  ******************************/
 //apply from: "profile-${env}.gradle"
+def env = "$defaultEnv"
+/***************************   请勿修改 上面的值  ******************************/
+//version = '0.0.1'
+
+def baseArchivesName = 'gradle-multi-profile'
+if ( "" != "$env") {
+    // 包名规则， 如果 version 存在 则 $baseArchivesName-$env-$version (version 会自动追加！)，
+    // 否则 $baseArchivesName-$env-$currentTimeStr
+    if ( version == null || "unspecified" == "$version" ||  "" == "$version"){
+        archivesBaseName = "$baseArchivesName-$env-$currentTimeStr"
+        println "当前时间: $currentTime, 当前 profile: $env, 包名: $archivesBaseName"
+    }else{
+        archivesBaseName = "$baseArchivesName-$env"
+        println "当前时间: $currentTime, 当前 profile: $env, 包名: $archivesBaseName-$version"
+    }
+} else {
+    throw new Exception("error profile flag!")
+}
 
 sourceSets {
     main {
@@ -12,9 +42,6 @@ sourceSets {
         }
     }
 }
-
-archivesBaseName = 'gradle-multi-profile'
-version = '0.0.1'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -33,6 +60,7 @@ buildscript {
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
     }
+    println "buildscript"
 }
 
 apply plugin: 'eclipse'
