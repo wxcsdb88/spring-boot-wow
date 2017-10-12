@@ -1,16 +1,9 @@
-package com.futurever.core.utils.file;/**
- * Description:
- * TODO
- *
- * @author wxcsdb88
- * @since 2017-10-12 21:12
- **/
+package com.futurever.core.utils.file;
 
 import org.junit.Test;
 
 /**
  * Description:
- * TODO
  *
  * @author wxcsdb88
  * @since 2017-10-12 21:12
