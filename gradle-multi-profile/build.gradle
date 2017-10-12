@@ -124,3 +124,6 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
