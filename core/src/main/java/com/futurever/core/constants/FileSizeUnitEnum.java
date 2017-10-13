@@ -8,7 +8,7 @@ import com.google.common.base.MoreObjects;
  * @author: wxcsdb88
  * @since: 2017/10/12 15:56
  */
-public enum FileSizeUnit {
+public enum FileSizeUnitEnum {
     /**
      * 1B (byte 字节)；
      * 1KB(Kilobyte 千字节) = 2^10 B = 1024 B；
@@ -37,39 +37,39 @@ public enum FileSizeUnit {
     private String unit;
     private String unitCh;
 
-    FileSizeUnit(long size, String unit, String unitCh) {
+    FileSizeUnitEnum(long size, String unit, String unitCh) {
         this.size = size;
         this.unit = unit;
         this.unitCh = unitCh;
     }
 
-    public static FileSizeUnit sizeOf(long size) {
-        FileSizeUnit[] fileSizeUnits = FileSizeUnit.values();
-        for (FileSizeUnit fileSizeUnit : fileSizeUnits) {
+    public static FileSizeUnitEnum sizeOf(long size) {
+        FileSizeUnitEnum[] fileSizeUnits = FileSizeUnitEnum.values();
+        for (FileSizeUnitEnum fileSizeUnit : fileSizeUnits) {
             if (fileSizeUnit.size == size) return fileSizeUnit;
         }
         return null;
     }
 
     public static long sizeOfUnit(String unit) {
-        FileSizeUnit[] fileSizeUnits = FileSizeUnit.values();
-        for (FileSizeUnit fileSizeUnit : fileSizeUnits) {
+        FileSizeUnitEnum[] fileSizeUnits = FileSizeUnitEnum.values();
+        for (FileSizeUnitEnum fileSizeUnit : fileSizeUnits) {
             if (fileSizeUnit.unit.equals(unit)) return fileSizeUnit.size;
         }
         return -1L;
     }
 
-    public static FileSizeUnit unitOf(String unit) {
-        FileSizeUnit[] fileSizeUnits = FileSizeUnit.values();
-        for (FileSizeUnit fileSizeUnit : fileSizeUnits) {
+    public static FileSizeUnitEnum unitOf(String unit) {
+        FileSizeUnitEnum[] fileSizeUnits = FileSizeUnitEnum.values();
+        for (FileSizeUnitEnum fileSizeUnit : fileSizeUnits) {
             if (fileSizeUnit.unit.equals(unit)) return fileSizeUnit;
         }
         return null;
     }
 
-    public static FileSizeUnit unitChOf(String unitCh) {
-        FileSizeUnit[] fileSizeUnits = FileSizeUnit.values();
-        for (FileSizeUnit fileSizeUnit : fileSizeUnits) {
+    public static FileSizeUnitEnum unitChOf(String unitCh) {
+        FileSizeUnitEnum[] fileSizeUnits = FileSizeUnitEnum.values();
+        for (FileSizeUnitEnum fileSizeUnit : fileSizeUnits) {
             if (fileSizeUnit.unitCh.equals(unitCh)) return fileSizeUnit;
         }
         return null;

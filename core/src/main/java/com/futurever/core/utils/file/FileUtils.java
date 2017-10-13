@@ -1,6 +1,6 @@
 package com.futurever.core.utils.file;
 
-import com.futurever.core.constants.FileSizeUnit;
+import com.futurever.core.constants.FileSizeUnitEnum;
 
 import java.text.DecimalFormat;
 import java.util.regex.Matcher;
@@ -39,26 +39,26 @@ public class FileUtils {
         }
 
         String fileSizeString = "";
-        if (fileS < FileSizeUnit.sizeOfUnit("B")) {
+        if (fileS < FileSizeUnitEnum.sizeOfUnit("B")) {
             fileSizeString = df.format((double) fileS) + "B";
-        } else if (fileS < FileSizeUnit.sizeOfUnit("KB")) {
-            fileSizeString = df.format((double) fileS / FileSizeUnit.sizeOfUnit("B")) + "B";
-        } else if (fileS < FileSizeUnit.sizeOfUnit("MB")) {
-            fileSizeString = df.format((double) fileS / FileSizeUnit.sizeOfUnit("KB")) + "KB";
-        } else if (fileS < FileSizeUnit.sizeOfUnit("GB")) {
-            fileSizeString = df.format((double) fileS / FileSizeUnit.sizeOfUnit("MB")) + "MB";
-        } else if (fileS < FileSizeUnit.sizeOfUnit("TB")) {
-            fileSizeString = df.format((double) fileS / FileSizeUnit.sizeOfUnit("GB")) + "GB";
-        } else if (fileS < FileSizeUnit.sizeOfUnit("PB")) {
-            fileSizeString = df.format((double) fileS / FileSizeUnit.sizeOfUnit("TB")) + "TB";
-        } else if (fileS < FileSizeUnit.sizeOfUnit("EB")) {
-            fileSizeString = df.format((double) fileS / FileSizeUnit.sizeOfUnit("PB")) + "PB";
-        } else if (fileS < FileSizeUnit.sizeOfUnit("ZB")) {
-            fileSizeString = df.format((double) fileS / FileSizeUnit.sizeOfUnit("EB")) + "EB";
-        } else if (fileS < FileSizeUnit.sizeOfUnit("YB")) {
-            fileSizeString = df.format((double) fileS / FileSizeUnit.sizeOfUnit("ZB")) + "ZB";
+        } else if (fileS < FileSizeUnitEnum.sizeOfUnit("KB")) {
+            fileSizeString = df.format((double) fileS / FileSizeUnitEnum.sizeOfUnit("B")) + "B";
+        } else if (fileS < FileSizeUnitEnum.sizeOfUnit("MB")) {
+            fileSizeString = df.format((double) fileS / FileSizeUnitEnum.sizeOfUnit("KB")) + "KB";
+        } else if (fileS < FileSizeUnitEnum.sizeOfUnit("GB")) {
+            fileSizeString = df.format((double) fileS / FileSizeUnitEnum.sizeOfUnit("MB")) + "MB";
+        } else if (fileS < FileSizeUnitEnum.sizeOfUnit("TB")) {
+            fileSizeString = df.format((double) fileS / FileSizeUnitEnum.sizeOfUnit("GB")) + "GB";
+        } else if (fileS < FileSizeUnitEnum.sizeOfUnit("PB")) {
+            fileSizeString = df.format((double) fileS / FileSizeUnitEnum.sizeOfUnit("TB")) + "TB";
+        } else if (fileS < FileSizeUnitEnum.sizeOfUnit("EB")) {
+            fileSizeString = df.format((double) fileS / FileSizeUnitEnum.sizeOfUnit("PB")) + "PB";
+        } else if (fileS < FileSizeUnitEnum.sizeOfUnit("ZB")) {
+            fileSizeString = df.format((double) fileS / FileSizeUnitEnum.sizeOfUnit("EB")) + "EB";
+        } else if (fileS < FileSizeUnitEnum.sizeOfUnit("YB")) {
+            fileSizeString = df.format((double) fileS / FileSizeUnitEnum.sizeOfUnit("ZB")) + "ZB";
         } else {
-            fileSizeString = df.format((double) fileS / FileSizeUnit.sizeOfUnit("YB")) + "YB";
+            fileSizeString = df.format((double) fileS / FileSizeUnitEnum.sizeOfUnit("YB")) + "YB";
         }
         return fileSizeString;
     }
@@ -84,7 +84,7 @@ public class FileUtils {
         } else {
             return -1L;
         }
-        return (long) (sizeVal * FileSizeUnit.sizeOfUnit(sizeUnit));
+        return (long) (sizeVal * FileSizeUnitEnum.sizeOfUnit(sizeUnit));
     }
 
 }

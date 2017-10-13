@@ -8,10 +8,14 @@ import org.junit.Test;
  * @author wxcsdb88
  * @since 2017-10-12 21:12
  **/
-public class FileUtilsTest {
+public class FileUtilsEnumTest {
 
     @Test
     public void test() throws Exception {
+        System.out.println(FileUtils.formatFileSize(200));
+        System.out.println(FileUtils.formatFileSize(200000));
+        System.out.println(FileUtils.formatFileSize(200000000));
+        System.out.println(FileUtils.formatFileSize(2000000000,2));
         System.out.println(FileUtils.formatFileSize(0));
         System.out.println(FileUtils.formatFileSize(100));
         System.out.println(FileUtils.formatFileSize(1024));
