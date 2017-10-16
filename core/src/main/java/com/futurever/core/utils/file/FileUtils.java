@@ -4,7 +4,9 @@ import com.futurever.core.constants.FileSizeUnitEnum;
 
 import java.text.DecimalFormat;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static com.futurever.core.constants.RegConstants.PATTERN_INCLUDE_NUMERIC_AND_DOT;
+import static com.futurever.core.constants.RegConstants.PATTERN_NOT_INCLUDE_NUMERIC_AND_DOT;
 
 /**
  * description:
@@ -18,12 +20,12 @@ public class FileUtils {
         return formatFileSize(fileS, 1);
     }
 
-    public static String formatFileSize(long fileS, Integer num_digits) {
-        if (num_digits == null) {
-            num_digits = 1;
+    public static String formatFileSize(long fileS, Integer numDigits) {
+        if (numDigits == null) {
+            numDigits = 1;
         }
         DecimalFormat df;
-        switch (num_digits) {
+        switch (numDigits) {
             case 0:
                 df = new DecimalFormat("#");
                 break;
@@ -69,15 +71,13 @@ public class FileUtils {
     }
 
     public static long getByteNumberFromSizeUnitStr(String sizeUnitStr) {
-        Pattern pattern = Pattern.compile("[^0-9.]");
-        Matcher matcher = pattern.matcher(sizeUnitStr);
+        Matcher matcher = PATTERN_NOT_INCLUDE_NUMERIC_AND_DOT.matcher(sizeUnitStr);
 
         double sizeVal = 1L;
         if (matcher.find()) {
             sizeVal = Double.valueOf(matcher.replaceAll(""));
         }
-        pattern = Pattern.compile("[0-9.]");
-        matcher = pattern.matcher(sizeUnitStr);
+        matcher = PATTERN_INCLUDE_NUMERIC_AND_DOT.matcher(sizeUnitStr);
         String sizeUnit = "";
         if (matcher.find()) {
             sizeUnit = matcher.replaceAll("");

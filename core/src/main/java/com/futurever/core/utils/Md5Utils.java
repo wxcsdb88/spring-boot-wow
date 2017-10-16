@@ -9,7 +9,7 @@ import java.security.SecureRandom;
 import java.util.Random;
 
 
-public class MD5Utils {
+public class Md5Utils {
     private static final String HEX_NUMS_STR = "0123456789ABCDEF";
     private static final Integer DEFAULT_SALT_LENGTH = 16;
     private static final Integer DEFAULT_MD5_LENGTH = 32;
@@ -28,7 +28,7 @@ public class MD5Utils {
             saltLength = DEFAULT_MD5_LENGTH;
         }
         SecureRandom random = new SecureRandom();
-        byte bytes[] = new byte[saltLength];
+        byte[] bytes = new byte[saltLength];
         random.nextBytes(bytes);
         return bytes;
     }
@@ -37,7 +37,7 @@ public class MD5Utils {
         return md5.length() == 32 ? md5 : fillMD5("0" + md5);
     }
 
-    public static String MD5(String input) {
+    public static String md5(String input) {
         MessageDigest md5 = null;
         if (input == null) {
             input = "";

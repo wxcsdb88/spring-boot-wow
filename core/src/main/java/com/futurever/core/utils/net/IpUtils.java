@@ -40,7 +40,7 @@ public class IpUtils {
             BigInteger part1 = ipv6toBigInt(part1s);
             BigInteger part2 = ipv6toBigInt(part2s);
             int part1hasDot = 0;
-            char ch[] = part1s.toCharArray();
+            char[] ch = part1s.toCharArray();
             for (char c : ch) {
                 if (c == ':') {
                     part1hasDot++;
@@ -65,13 +65,13 @@ public class IpUtils {
     public static String bigIntToIpv6(BigInteger big) {
         String str = "";
         BigInteger ff = BigInteger.valueOf(0xffff);
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 8; i++) {
-            str = big.and(ff).toString(16) + ":" + str;
-
+            sb = sb.insert(0,":").insert(0, big.and(ff).toString(16));
             big = big.shiftRight(16);
         }
         //the last :
-        str = str.substring(0, str.length() - 1);
+        str = sb.substring(0, sb.length() - 1);
         return str.replaceFirst("(^|:)(0+(:|$)){2,8}", "::");
     }
 

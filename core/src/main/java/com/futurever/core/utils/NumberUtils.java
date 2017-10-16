@@ -7,7 +7,8 @@ package com.futurever.core.utils;/**
  **/
 
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static com.futurever.core.constants.RegConstants.PATTERN_IS_NUMERIC;
 
 /**
  * Description:
@@ -53,8 +54,7 @@ public class NumberUtils {
         if (trim) {
             str = str.trim();
         }
-        Pattern pattern = Pattern.compile("[0-9]*");
-        Matcher isNum = pattern.matcher(str);
+        Matcher isNum = PATTERN_IS_NUMERIC.matcher(str);
         return isNum.matches();
     }
 }

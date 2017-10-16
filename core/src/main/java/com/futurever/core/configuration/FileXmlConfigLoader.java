@@ -33,6 +33,7 @@ public class FileXmlConfigLoader implements ConfigLoader {
         this.fileName = fileName;
     }
 
+    @Override
     public Properties load()
             throws Exception {
         Properties properties = new Properties();
@@ -49,16 +50,16 @@ public class FileXmlConfigLoader implements ConfigLoader {
             NodeList configList = root.getElementsByTagName("package");
             for (int i = 0; i < configList.getLength(); i++) {
                 Element configElement = (Element) configList.item(i);
-                String package_name = configElement.getAttribute("name");
-                if ((package_name != null) && (!package_name.equals(""))) {
-                    package_name = package_name + ".";
+                String packageName = configElement.getAttribute("name");
+                if ((packageName != null) && (!"".equals(packageName))) {
+                    packageName = packageName + ".";
                 } else {
-                    package_name = "";
+                    packageName = "";
                 }
                 NodeList propertyList = configElement.getElementsByTagName("property");
                 for (int j = 0; j < propertyList.getLength(); j++) {
                     Element propertyElement = (Element) propertyList.item(j);
-                    properties.put(package_name + propertyElement.getAttribute("name"), propertyElement.getTextContent());
+                    properties.put(packageName + propertyElement.getAttribute("name"), propertyElement.getTextContent());
                 }
             }
         } catch (Exception e) {
@@ -78,6 +79,7 @@ public class FileXmlConfigLoader implements ConfigLoader {
         return properties;
     }
 
+    @Override
     public void save(Properties properties)
             throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -88,20 +90,20 @@ public class FileXmlConfigLoader implements ConfigLoader {
             Element root = doc.createElement("config");
             doc.appendChild(root);
 
-            Map<String, Element> keyPathMap = new HashMap();
+            Map<String, Element> keyPathMap = new HashMap<>(properties.stringPropertyNames().size());
             for (String key : properties.stringPropertyNames()) {
                 String value = properties.getProperty(key);
-                String key_pack = key.substring(0, key.indexOf("."));
-                String key_prop = key.substring(key.indexOf("."));
-                Element pack = (Element) keyPathMap.get(key_pack);
+                String keyPack = key.substring(0, key.indexOf("."));
+                String keyProp = key.substring(key.indexOf("."));
+                Element pack = (Element) keyPathMap.get(keyPack);
                 if (pack == null) {
                     pack = doc.createElement("package");
-                    pack.setAttribute("name", key_pack);
+                    pack.setAttribute("name", keyPack);
                     root.appendChild(pack);
-                    keyPathMap.put(key_pack, pack);
+                    keyPathMap.put(keyPack, pack);
                 }
                 Element prop = doc.createElement("property");
-                prop.setAttribute(key_prop, value);
+                prop.setAttribute(keyProp, value);
                 pack.appendChild(prop);
             }
             OutputStreamWriter outwriter = new OutputStreamWriter(os);

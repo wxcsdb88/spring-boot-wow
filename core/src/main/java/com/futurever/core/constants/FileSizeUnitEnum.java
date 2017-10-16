@@ -46,7 +46,9 @@ public enum FileSizeUnitEnum {
     public static FileSizeUnitEnum sizeOf(long size) {
         FileSizeUnitEnum[] fileSizeUnits = FileSizeUnitEnum.values();
         for (FileSizeUnitEnum fileSizeUnit : fileSizeUnits) {
-            if (fileSizeUnit.size == size) return fileSizeUnit;
+            if (fileSizeUnit.size == size) {
+                return fileSizeUnit;
+            }
         }
         return null;
     }
@@ -54,7 +56,9 @@ public enum FileSizeUnitEnum {
     public static long sizeOfUnit(String unit) {
         FileSizeUnitEnum[] fileSizeUnits = FileSizeUnitEnum.values();
         for (FileSizeUnitEnum fileSizeUnit : fileSizeUnits) {
-            if (fileSizeUnit.unit.equals(unit)) return fileSizeUnit.size;
+            if (fileSizeUnit.unit.equals(unit)) {
+                return fileSizeUnit.size;
+            }
         }
         return -1L;
     }
@@ -62,7 +66,9 @@ public enum FileSizeUnitEnum {
     public static FileSizeUnitEnum unitOf(String unit) {
         FileSizeUnitEnum[] fileSizeUnits = FileSizeUnitEnum.values();
         for (FileSizeUnitEnum fileSizeUnit : fileSizeUnits) {
-            if (fileSizeUnit.unit.equals(unit)) return fileSizeUnit;
+            if (fileSizeUnit.unit.equals(unit)) {
+                return fileSizeUnit;
+            }
         }
         return null;
     }
@@ -70,7 +76,9 @@ public enum FileSizeUnitEnum {
     public static FileSizeUnitEnum unitChOf(String unitCh) {
         FileSizeUnitEnum[] fileSizeUnits = FileSizeUnitEnum.values();
         for (FileSizeUnitEnum fileSizeUnit : fileSizeUnits) {
-            if (fileSizeUnit.unitCh.equals(unitCh)) return fileSizeUnit;
+            if (fileSizeUnit.unitCh.equals(unitCh)) {
+                return fileSizeUnit;
+            }
         }
         return null;
     }
