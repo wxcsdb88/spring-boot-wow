@@ -102,7 +102,7 @@ public class WebRequestLogAspect {
         String methodName = joinPoint.getSignature().getName();
 
         String outputLog = "({}.{}) doAfterThrowing API_INFO[method={} uri={} code={} from={} to={} cost={}ms parameters=({})] msg=({})";
-        logger.error(outputLog, beanName, methodName, method, uri, Response.SERVICE_EXCEPTION, remoteAddr, localAddr, String.format("%1$.3f", 0.00), queryString, ex);
+        logger.error(outputLog, beanName, methodName, method, uri, Response.INTERNAL_SERVER_ERROR, remoteAddr, localAddr, String.format("%1$.3f", 0.00), queryString, ex);
     }
 
 }
