@@ -1,6 +1,10 @@
 package com.futurever.core.utils.net;
 
 import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 
 /**
  * description:
@@ -9,6 +13,51 @@ import java.math.BigInteger;
  * @since: 2017/10/13 09:58
  */
 public class IpUtils {
+    private final static String UNKNOWN_STR = "unknown";
+
+    /**
+     * todo：本地ip解析需进一步处理
+     * @return
+     * @throws SocketException
+     */
+    public static String getLocalRealIp() throws SocketException {
+        // 本地IP，如果没有配置外网IP则返回它
+        String localIp = null;
+        // 外网IP
+        String netIp = null;
+
+        Enumeration<NetworkInterface> netInterfaces =
+                NetworkInterface.getNetworkInterfaces();
+        InetAddress ip = null;
+        // 是否找到外网IP
+        boolean isFind = false;
+        while (netInterfaces.hasMoreElements() && !isFind) {
+            NetworkInterface ni = netInterfaces.nextElement();
+            Enumeration<InetAddress> address = ni.getInetAddresses();
+            while (address.hasMoreElements()) {
+                ip = address.nextElement();
+                if (!ip.isSiteLocalAddress()
+                        && !ip.isLoopbackAddress()
+                        && ip.getHostAddress().contains(":")) {
+                    // 外网IP
+                    netIp = ip.getHostAddress();
+                    isFind = true;
+                    break;
+                } else if (ip.isSiteLocalAddress()
+                        && !ip.isLoopbackAddress()
+                        && ip.getHostAddress().contains(":")) {
+                    // 内网IP
+                    localIp = ip.getHostAddress();
+                }
+            }
+        }
+
+        if (netIp != null && !"".equals(netIp)) {
+            return netIp;
+        } else {
+            return localIp;
+        }
+    }
 
     public static long ipv4ToLong(String ipAddress) {
         String[] ipAddressInArray = ipAddress.split("\\.");

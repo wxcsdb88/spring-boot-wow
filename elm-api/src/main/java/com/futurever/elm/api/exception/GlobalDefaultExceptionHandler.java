@@ -16,7 +16,10 @@ import static com.futurever.elm.api.utils.IPUtils.getIpAddr;
 import static com.futurever.elm.api.utils.IPUtils.getLocalRealIp;
 
 /**
- * Created by wxcsdb88 on 2017/8/11 13:13.
+ * 全局异常格式化处理
+ *
+ * @author wxcsdb88
+ * @since 2017/8/11 13:13.
  */
 @RestController
 @ControllerAdvice

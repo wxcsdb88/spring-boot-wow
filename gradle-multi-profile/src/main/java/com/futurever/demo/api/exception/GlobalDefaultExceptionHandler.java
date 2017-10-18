@@ -1,25 +1,42 @@
 package com.futurever.demo.api.exception;
 
+import com.futurever.demo.api.common.RequestDO;
 import com.futurever.demo.api.common.ResponseData;
 import com.futurever.demo.api.constants.Response;
+import com.futurever.demo.api.utils.RequestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.ConversionNotSupportedException;
+import org.springframework.beans.TypeMismatchException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.util.ClassUtils;
+import org.springframework.validation.BindException;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URLDecoder;
 
-import static com.futurever.demo.api.utils.IPUtils.getIpAddr;
-import static com.futurever.demo.api.utils.IPUtils.getLocalRealIp;
+import static com.futurever.core.utils.net.IpUtils.getLocalRealIp;
+import static com.futurever.demo.api.utils.IpUtils.getClientAddr;
 
 /**
- * description:
+ * description: 全局异常参数格式化处理
  *
  * @author : wxcsdb88
  * @since : 2017/10/10 15:20
@@ -34,22 +51,24 @@ public class GlobalDefaultExceptionHandler {
     public ResponseData defaultErrorHandler(HttpServletRequest request, HttpServletResponse response, Exception ex) throws Exception {
         ResponseData responseData = new ResponseData();
         String queryString = request.getQueryString();
-        queryString = URLDecoder.decode(queryString, "UTF-8");
-        String uri = request.getRequestURL().toString();
-        String remoteAddr = getIpAddr(request);
+        if (queryString != null && !"".equals(queryString)) {
+            queryString = URLDecoder.decode(queryString, "UTF-8");
+        }
+        String url = request.getRequestURL().toString();
+        String remoteAddr = getClientAddr(request);
         String token = request.getHeader("token");
         String method = request.getMethod();
-        String output_log = "defaultErrorHandler [method={} uri={}  code={} from={} to={} cost={}ms parameters=({})] msg=({})";
-        logger.error(output_log, method, uri, response.getStatus(), remoteAddr, getLocalRealIp(), String.format("%1$.3f", 0.00), queryString, ex);
+        String output_log = "defaultErrorHandler [method={} url={}  code={} from={} to={} cost={}ms parameters=({})] msg=({})";
+        logger.error(output_log, method, url, response.getStatus(), remoteAddr, getLocalRealIp(), String.format("%1$.3f", 0.00), queryString, ex);
 
         if (ex instanceof org.springframework.web.servlet.NoHandlerFoundException) {
             responseData.setCode(Response.NO_HANDLER_FOUND_EXCEPTION);
             String out_info = "No handler found for %s %s";
-            responseData.setMsg(String.format(out_info, method, uri));
+            responseData.setMsg(String.format(out_info, method, url));
         } else if (ex instanceof NullPointerException) {
             responseData.setCode(Response.SERVICE_EXCEPTION);
             String out_info = "Error null value for  %s %s";
-            responseData.setMsg(String.format(out_info, method, uri));
+            responseData.setMsg(String.format(out_info, method, url));
         } else if (ex instanceof org.springframework.web.bind.MissingServletRequestParameterException) {
             // required parameter in spring annotation
             responseData.setCode(Response.INVALID_PARAMETER);
@@ -70,27 +89,330 @@ public class GlobalDefaultExceptionHandler {
         return responseData;
     }
 
+    /*************************************  DefaultHandlerExceptionResolver start ***********************************************/
+    /**
+     * HTTP HttpRequestMethodNotSupportedException
+     * 请求方法不匹配
+     *
+     * @param request {@link HttpServletRequest}
+     * @param ex      {@link HttpRequestMethodNotSupportedException}
+     * @return {@link ResponseData}
+     */
+    @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
+    @ResponseBody
+    public ResponseData httpRequestMethodNotSupportedExceptionHandler(HttpServletRequest request, HttpRequestMethodNotSupportedException ex) {
+        ResponseData<Boolean> responseData = new ResponseData<>();
+        RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
+
+        String resultMsg = String.format("HttpRequestMethodNotSupportedException: 传入值 [%s], 允许值 %s", ex.getMethod(), ex.getSupportedHttpMethods());
+        responseData.setError(resultMsg, false);
+        String outputLog = "httpRequestMethodNotSupportedExceptionHandler [method={} url={}  code={} from={} to={} parameters=({}) msg=({})]";
+        logger.error(outputLog, requestDO.getMethod(), requestDO.getRequestURL(), Response.ERROR, requestDO.getClientAddr(), requestDO.getLocalAddr(), requestDO.getQueryString(), resultMsg);
+        return responseData;
+    }
+
+    /**
+     * HTTP HttpMediaTypeNotSupportedException
+     *
+     * @param request {@link HttpServletRequest}
+     * @param ex      {@link HttpMediaTypeNotSupportedException}
+     * @return {@link ResponseData}
+     */
+    @ExceptionHandler({HttpMediaTypeNotSupportedException.class})
+    @ResponseBody
+    public ResponseData httpMediaTypeNotSupportedExceptionHandler(HttpServletRequest request, HttpMediaTypeNotSupportedException ex) {
+        ResponseData<Boolean> responseData = new ResponseData<>();
+        RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
+        String resultMsg = String.format("HttpMediaTypeNotSupportedException: 传入值 [%s], 允许值 %s", ex.getContentType(), ex.getSupportedMediaTypes());
+        responseData.setError(resultMsg, false);
+        String outputLog = "httpMediaTypeNotSupportedExceptionHandler [method={} url={}  code={} from={} to={} parameters=({}) msg=({})]";
+        logger.error(outputLog, requestDO.getMethod(), requestDO.getRequestURL(), Response.ERROR, requestDO.getClientAddr(), requestDO.getLocalAddr(), requestDO.getQueryString(), resultMsg);
+        return responseData;
+    }
+
+    /**
+     * HTTP HttpMediaTypeNotAcceptable
+     *
+     * @param request {@link HttpServletRequest}
+     * @param ex      {@link HttpMediaTypeNotAcceptableException}
+     * @return {@link ResponseData}
+     */
+    @ExceptionHandler({HttpMediaTypeNotAcceptableException.class})
+    @ResponseBody
+    public ResponseData httpMediaTypeNotAcceptableExceptionHandler(HttpServletRequest request, HttpMediaTypeNotAcceptableException ex) {
+        ResponseData<Boolean> responseData = new ResponseData<>();
+        RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
+        String resultMsg = String.format("HttpMediaTypeNotAcceptable: 允许值 %s", ex.getSupportedMediaTypes());
+        responseData.setError(resultMsg, false);
+        String outputLog = "httpMediaTypeNotAcceptableExceptionHandler [method={} url={}  code={} from={} to={} parameters=({}) msg=({})]";
+        logger.error(outputLog, requestDO.getMethod(), requestDO.getRequestURL(), Response.ERROR, requestDO.getClientAddr(), requestDO.getLocalAddr(), requestDO.getQueryString(), resultMsg);
+        return responseData;
+    }
+
+    /**
+     * HTTP MissingPathVariableException
+     *
+     * @param request {@link HttpServletRequest}
+     * @param ex      {@link MissingPathVariableException}
+     * @return {@link ResponseData}
+     */
+    @ExceptionHandler({MissingPathVariableException.class})
+    @ResponseBody
+    public ResponseData missingPathVariableExceptionHandler(HttpServletRequest request, MissingPathVariableException ex) {
+        ResponseData<Boolean> responseData = new ResponseData<>();
+        RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
+        String resultMsg = String.format("MissingPathVariableException:  缺失路径参数 %s， 类型 %s", ex.getVariableName(),
+                ex.getParameter().getParameterType().getSimpleName());
+        responseData.setError(resultMsg, false);
+        String outputLog = "missingPathVariableExceptionHandler [method={} url={}  code={} from={} to={} parameters=({}) msg=({})]";
+        logger.error(outputLog, requestDO.getMethod(), requestDO.getRequestURL(), Response.ERROR, requestDO.getClientAddr(), requestDO.getLocalAddr(), requestDO.getQueryString(), resultMsg);
+        return responseData;
+    }
+
+    /**
+     * HTTP MissingServletRequestParameterException
+     *
+     * @param request {@link HttpServletRequest}
+     * @param ex      {@link MissingServletRequestParameterException}
+     * @return {@link ResponseData}
+     */
+    @ExceptionHandler({MissingServletRequestParameterException.class})
+    @ResponseBody
+    public ResponseData missingServletRequestParameterExceptionHandler(HttpServletRequest request, MissingServletRequestParameterException ex) {
+        ResponseData<Boolean> responseData = new ResponseData<>();
+        RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
+        String resultMsg = String.format("MissingServletRequestParameterException:  缺失请求参数 %s， 类型 %s", ex.getParameterName(),
+                ex.getParameterType());
+        responseData.setError(resultMsg, false);
+        String outputLog = "missingServletRequestParameterExceptionHandler [method={} url={}  code={} from={} to={} parameters=({}) msg=({})]";
+        logger.error(outputLog, requestDO.getMethod(), requestDO.getRequestURL(), Response.ERROR, requestDO.getClientAddr(), requestDO.getLocalAddr(), requestDO.getQueryString(), resultMsg);
+        return responseData;
+    }
+
+    /**
+     * HTTP ServletRequestBindingException
+     *
+     * @param request {@link HttpServletRequest}
+     * @param ex      {@link ServletRequestBindingException}
+     * @return {@link ResponseData}
+     */
+    @ExceptionHandler({ServletRequestBindingException.class})
+    @ResponseBody
+    public ResponseData servletRequestBindingExceptionHandler(HttpServletRequest request, ServletRequestBindingException ex) {
+        ResponseData<Boolean> responseData = new ResponseData<>();
+        RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
+        String resultMsg = String.format("ServletRequestBindingException:  请求绑定异常 %s", ex.getCause());
+        responseData.setError(resultMsg, false);
+        String outputLog = "servletRequestBindingExceptionHandler [method={} url={}  code={} from={} to={} parameters=({}) msg=({})]";
+        logger.error(outputLog, requestDO.getMethod(), requestDO.getRequestURL(), Response.ERROR, requestDO.getClientAddr(), requestDO.getLocalAddr(), requestDO.getQueryString(), resultMsg);
+        return responseData;
+    }
+
+    /**
+     * HTTP ConversionNotSupportedException
+     *
+     * @param request {@link HttpServletRequest}
+     * @param ex      {@link ConversionNotSupportedException}
+     * @return {@link ResponseData}
+     */
+    @ExceptionHandler({ConversionNotSupportedException.class})
+    @ResponseBody
+    public ResponseData conversionNotSupportedExceptionHandler(HttpServletRequest request, ConversionNotSupportedException ex) {
+        ResponseData<Boolean> responseData = new ResponseData<>();
+        RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
+        String resultMsg = String.format("ConversionNotSupportedException:  属性 %s, 值 %s, 类型 %s, 目标类型 %s, " +
+                        "错误码 %s", ex.getPropertyName(), ex.getValue(), ClassUtils.getDescriptiveType(ex.getValue()),
+                ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : ex.getCause(), ex.getErrorCode());
+        responseData.setError(resultMsg, false);
+        String outputLog = "conversionNotSupportedExceptionHandler [method={} url={}  code={} from={} to={} parameters=({}) msg=({})]";
+        logger.error(outputLog, requestDO.getMethod(), requestDO.getRequestURL(), Response.ERROR, requestDO.getClientAddr(), requestDO.getLocalAddr(), requestDO.getQueryString(), resultMsg);
+        return responseData;
+    }
+
+    /**
+     * HTTP TypeMismatchException
+     *
+     * @param request {@link HttpServletRequest}
+     * @param ex      {@link TypeMismatchException}
+     * @return {@link ResponseData}
+     */
+    @ExceptionHandler({TypeMismatchException.class})
+    @ResponseBody
+    public ResponseData typeMismatchExceptionHandler(HttpServletRequest request, TypeMismatchException ex) {
+        ResponseData<Boolean> responseData = new ResponseData<>();
+        RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
+        String resultMsg = String.format("TypeMismatchException:  属性 %s, 值 %s, 类型 %s, 目标类型 %s, " +
+                        "错误码 %s", ex.getPropertyName(), ex.getValue(), ClassUtils.getDescriptiveType(ex.getValue()),
+                ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : ex.getCause(), ex.getErrorCode());
+        responseData.setError(resultMsg, false);
+        String outputLog = "typeMismatchExceptionHandler [method={} url={}  code={} from={} to={} parameters=({}) msg=({})]";
+        logger.error(outputLog, requestDO.getMethod(), requestDO.getRequestURL(), Response.ERROR, requestDO.getClientAddr(), requestDO.getLocalAddr(), requestDO.getQueryString(), resultMsg);
+        return responseData;
+    }
+
+    /**
+     * HTTP HttpMessageNotReadableException
+     *
+     * @param request {@link HttpServletRequest}
+     * @param ex      {@link HttpMessageNotReadableException}
+     * @return {@link ResponseData}
+     */
+    @ExceptionHandler({HttpMessageNotReadableException.class})
+    @ResponseBody
+    public ResponseData httpMessageNotReadableExceptionHandler(HttpServletRequest request, HttpMessageNotReadableException ex) {
+        ResponseData<Boolean> responseData = new ResponseData<>();
+        RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
+        String resultMsg = String.format("HttpMessageNotReadableException:  %s ", ex.getCause());
+        responseData.setError(resultMsg, false);
+        String outputLog = "httpMessageNotReadableExceptionHandler [method={} url={}  code={} from={} to={} parameters=({}) msg=({})]";
+        logger.error(outputLog, requestDO.getMethod(), requestDO.getRequestURL(), Response.ERROR, requestDO.getClientAddr(), requestDO.getLocalAddr(), requestDO.getQueryString(), resultMsg);
+        return responseData;
+    }
+
+    /**
+     * HTTP HttpMessageNotWritableException
+     *
+     * @param request {@link HttpServletRequest}
+     * @param ex      {@link HttpMessageNotWritableException}
+     * @return {@link ResponseData}
+     */
+    @ExceptionHandler({HttpMessageNotWritableException.class})
+    @ResponseBody
+    public ResponseData httpMessageNotWritableExceptionHandler(HttpServletRequest request, HttpMessageNotWritableException ex) {
+        ResponseData<Boolean> responseData = new ResponseData<>();
+        RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
+        String resultMsg = String.format("HttpMessageNotWritableException:  %s ", ex.getCause());
+        responseData.setError(resultMsg, false);
+        String outputLog = "httpMessageNotWritableExceptionHandler [method={} url={}  code={} from={} to={} parameters=({}) msg=({})]";
+        logger.error(outputLog, requestDO.getMethod(), requestDO.getRequestURL(), Response.ERROR, requestDO.getClientAddr(), requestDO.getLocalAddr(), requestDO.getQueryString(), resultMsg);
+        return responseData;
+    }
+
+    /**
+     * HTTP MethodArgumentNotValidException
+     *
+     * @param request {@link HttpServletRequest}
+     * @param ex      {@link MethodArgumentNotValidException}
+     * @return {@link ResponseData}
+     */
+    @ExceptionHandler({MethodArgumentNotValidException.class})
+    @ResponseBody
+    public ResponseData methodArgumentNotValidExceptionHandler(HttpServletRequest request, MethodArgumentNotValidException ex) {
+        ResponseData<Boolean> responseData = new ResponseData<>();
+        RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
+        String resultMsg = String.format("MethodArgumentNotValidException:  Validation failed for argument at " +
+                        "index %s in method: %s, with %s error(s) %s", ex.getParameter().getParameterIndex(),
+                ex.getParameter().getExecutable().toGenericString(), ex.getBindingResult().getErrorCount(),
+                ex.getBindingResult().getAllErrors());
+        responseData.setError(resultMsg, false);
+        String outputLog = "methodArgumentNotValidExceptionHandler [method={} url={}  code={} from={} to={} parameters=({}) msg=({})]";
+        logger.error(outputLog, requestDO.getMethod(), requestDO.getRequestURL(), Response.ERROR, requestDO.getClientAddr(), requestDO.getLocalAddr(), requestDO.getQueryString(), resultMsg);
+        return responseData;
+    }
+
+    /**
+     * HTTP MissingServletRequestPartException
+     *
+     * @param request {@link HttpServletRequest}
+     * @param ex      {@link MissingServletRequestPartException}
+     * @return {@link ResponseData}
+     */
+    @ExceptionHandler({MissingServletRequestPartException.class})
+    @ResponseBody
+    public ResponseData missingServletRequestPartExceptionHandler(HttpServletRequest request, MissingServletRequestPartException ex) {
+        ResponseData<Boolean> responseData = new ResponseData<>();
+        RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
+        String resultMsg = String.format("MissingServletRequestPartException:  request part %s 丢失",
+                ex.getRequestPartName());
+        responseData.setError(resultMsg, false);
+        String outputLog = "missingServletRequestPartExceptionHandler [method={} url={}  code={} from={} to={} parameters=({}) msg=({})]";
+        logger.error(outputLog, requestDO.getMethod(), requestDO.getRequestURL(), Response.ERROR, requestDO.getClientAddr(), requestDO.getLocalAddr(), requestDO.getQueryString(), resultMsg);
+        return responseData;
+    }
+
+    /**
+     * HTTP BindException
+     *
+     * @param request {@link HttpServletRequest}
+     * @param ex      {@link BindException}
+     * @return {@link ResponseData}
+     */
+    @ExceptionHandler({BindException.class})
+    @ResponseBody
+    public ResponseData bindExceptionHandler(HttpServletRequest request, BindException ex) {
+        ResponseData<Boolean> responseData = new ResponseData<>();
+        RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
+        String resultMsg = String.format("BindException:  %s", ex.getAllErrors());
+        responseData.setError(resultMsg, false);
+        String outputLog = "bindExceptionHandler [method={} url={}  code={} from={} to={} parameters=({}) msg=({})]";
+        logger.error(outputLog, requestDO.getMethod(), requestDO.getRequestURL(), Response.ERROR, requestDO.getClientAddr(), requestDO.getLocalAddr(), requestDO.getQueryString(), resultMsg);
+        return responseData;
+    }
+
+    /**
+     * HTTP NoHandlerFoundException
+     *
+     * @param request {@link HttpServletRequest}
+     * @param ex      {@link NoHandlerFoundException}
+     * @return {@link ResponseData}
+     */
+    @ExceptionHandler({NoHandlerFoundException.class})
+    @ResponseBody
+    public ResponseData noHandlerFoundExceptionHandler(HttpServletRequest request, NoHandlerFoundException ex) {
+        ResponseData<Boolean> responseData = new ResponseData<>();
+        RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
+        String resultMsg = String.format("NoHandlerFoundException:  [%s] %s 不存在匹配路径 ", ex.getHttpMethod(),
+                ex.getRequestURL());
+        responseData.setError(resultMsg, false);
+        String outputLog = "noHandlerFoundExceptionHandler [method={} url={}  code={} from={} to={} parameters=({}) msg=({})]";
+        logger.error(outputLog, requestDO.getMethod(), requestDO.getRequestURL(), Response.ERROR, requestDO.getClientAddr(), requestDO.getLocalAddr(), requestDO.getQueryString(), resultMsg);
+        return responseData;
+    }
+
+    /**
+     * HTTP AsyncRequestTimeoutException
+     *
+     * @param request {@link HttpServletRequest}
+     * @param ex      {@link AsyncRequestTimeoutException}
+     * @return {@link ResponseData}
+     */
+    @ExceptionHandler({AsyncRequestTimeoutException.class})
+    @ResponseBody
+    public ResponseData asyncRequestTimeoutExceptionHandler(HttpServletRequest request, AsyncRequestTimeoutException ex) {
+        ResponseData<Boolean> responseData = new ResponseData<>();
+        RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
+        String resultMsg = String.format("NoHandlerFoundException:  请求超时 %s ", ex.getCause());
+        responseData.setError(resultMsg, false);
+        String outputLog = "asyncRequestTimeoutExceptionHandler [method={} url={}  code={} from={} to={} parameters=({}) msg=({})]";
+        logger.error(outputLog, requestDO.getMethod(), requestDO.getRequestURL(), Response.ERROR, requestDO.getClientAddr(), requestDO.getLocalAddr(), requestDO.getQueryString(), resultMsg);
+        return responseData;
+    }
+
+    /*************************************  DefaultHandlerExceptionResolver end ***********************************************/
     //参数类型不匹配
     @ExceptionHandler({MethodArgumentTypeMismatchException.class})
     @ResponseBody
-    public ResponseData requestMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
+    public ResponseData requestMethodArgumentTypeMismatchException(HttpServletRequest request, HttpServletResponse response, MethodArgumentTypeMismatchException ex) {
         ResponseData<Boolean> responseData = new ResponseData<>();
-
-        String msg = String.format("参数类型不匹配, 参数 %s 值为 %s, 类型应该为 %s", ex.getName(), ex.getValue(),
+        String remoteAddr = getClientAddr(request);
+        String msg = String.format("参数类型不匹配, 参数 %s(%s), 类型应该为 %s", ex.getName(), ex.getValue(),
                 ex.getRequiredType() == null ? ex.getRequiredType() : ex.getRequiredType().getSimpleName());
         logger.error(msg);
         responseData.set(Response.INVALID_PARAMETER, msg, false);
         return responseData;
     }
 
-    //缺少参数异常
-    @ExceptionHandler({MissingServletRequestParameterException.class})
+    @ExceptionHandler({IllegalArgumentException.class})
     @ResponseBody
-    public ResponseData requestMissingServletRequestParameter(MissingServletRequestParameterException ex) {
+    public ResponseData requestIllegalArgumentException(HttpServletRequest request, HttpServletResponse response, IllegalArgumentException ex) {
         ResponseData<Boolean> responseData = new ResponseData<>();
-        String msg = String.format("缺少必要参数,参数名称为%s", ex.getParameterName());
+        RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
+        String remoteAddr = requestDO.getClientAddr();
+        String msg = String.format("非法参数 %s", ex.getMessage());
         logger.error(msg);
         responseData.set(Response.INVALID_PARAMETER, msg, false);
         return responseData;
     }
+
+
 }

@@ -19,8 +19,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
 
-import static com.futurever.demo.api.utils.IPUtils.getIpAddr;
-import static com.futurever.demo.api.utils.IPUtils.getLocalRealIp;
+import static com.futurever.demo.api.utils.IpUtils.getClientAddr;
 
 /**
  * description:
@@ -49,11 +48,15 @@ public class WebRequestLogAspect {
         }
         HttpServletRequest request = attributes.getRequest();
         String queryString = request.getQueryString();
+        if (queryString != null && !"".equals(queryString)) {
+            queryString = URLDecoder.decode(queryString, "UTF-8");
+        }
         String beanName = joinPoint.getSignature().getDeclaringTypeName();
         String methodName = joinPoint.getSignature().getName();
-        String uri = request.getRequestURL().toString();
+        String uri = request.getRequestURI();
 
-        String remoteAddr = getIpAddr(request);
+        String remoteAddr = getClientAddr(request);
+        String localAddr = request.getLocalAddr();
         String method = request.getMethod();
         Object[] args = joinPoint.getArgs();
 //      logger.warn(Arrays.toString(args));
@@ -64,8 +67,8 @@ public class WebRequestLogAspect {
         int code = responseData.getCode();
         String msg = responseData.getMsg();
 
-        String output_log = "({}.{}) doAround API_INFO[method={} uri={} code={} from={} to={} cost={}ms parameters=({})] msg=({})";
-        logger.info(output_log, beanName, methodName, method, uri, code, remoteAddr, getLocalRealIp(), String.format("%1$.3f", costTime), queryString, msg);
+        String outputLog = "({}.{}) doAround API_INFO[method={} uri={} code={} from={} to={} cost={}ms parameters=({})] msg=({})";
+        logger.info(outputLog, beanName, methodName, method, uri, code, remoteAddr, localAddr, String.format("%1$.3f", costTime), queryString, msg);
 
         // todo debug use
 //        String output_log2 = "doAround API_INFO[sign={} beanName={} methodName={} user={} method={} uri={}  code={} from={} to={} cost={}ms parameters=({})] msg=({})\nresponse={}";
@@ -74,11 +77,12 @@ public class WebRequestLogAspect {
     }
 
     @AfterThrowing(value = "webRequestLog()", throwing = "ex")
-    public void doAfterThrowing(JoinPoint joinPoint, Throwable ex) throws Throwable {
+    public void doAfterThrowing(JoinPoint joinPoint, Throwable ex) throws Exception {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         String queryString = "";
         String uri = "";
         String remoteAddr = "";
+        String localAddr = "";
         String method = "";
         if (null == attributes) {
             logger.error("error request!");
@@ -86,17 +90,19 @@ public class WebRequestLogAspect {
         } else {
             HttpServletRequest request = attributes.getRequest();
             queryString = request.getQueryString();
-            queryString = URLDecoder.decode(queryString, "UTF-8");
-            uri = request.getRequestURL().toString();
-            remoteAddr = getIpAddr(request);
+            if (queryString != null && !"".equals(queryString)) {
+                queryString = URLDecoder.decode(queryString, "UTF-8");
+            }
+            uri = request.getRequestURI();
+            remoteAddr = getClientAddr(request);
+            localAddr = request.getLocalAddr();
             method = request.getMethod();
         }
         String beanName = joinPoint.getSignature().getDeclaringTypeName();
         String methodName = joinPoint.getSignature().getName();
 
-
-        String output_log = "({}.{}) doAfterThrowing API_INFO[method={} uri={} code={} from={} to={} cost={}ms parameters=({})] msg=({})";
-        logger.error(output_log, beanName, methodName, method, uri, Response.SERVICE_EXCEPTION, remoteAddr, getLocalRealIp(), String.format("%1$.3f", 0.00), queryString, ex);
+        String outputLog = "({}.{}) doAfterThrowing API_INFO[method={} uri={} code={} from={} to={} cost={}ms parameters=({})] msg=({})";
+        logger.error(outputLog, beanName, methodName, method, uri, Response.SERVICE_EXCEPTION, remoteAddr, localAddr, String.format("%1$.3f", 0.00), queryString, ex);
     }
 
 }
