@@ -24,8 +24,8 @@ import static com.futurever.demo.api.utils.IpUtils.getClientAddr;
 /**
  * description:
  *
- * @author : wxcsdb88
- * @since : 2017/10/10 15:20
+ * @author wxcsdb88
+ * @since 2017/10/10 15:20
  */
 // 权限校验可能是1，日志优先级低于权限校验
 @Order(5)
@@ -102,7 +102,8 @@ public class WebRequestLogAspect {
         String methodName = joinPoint.getSignature().getName();
 
         String outputLog = "({}.{}) doAfterThrowing API_INFO[method={} uri={} code={} from={} to={} cost={}ms parameters=({})] msg=({})";
-        logger.error(outputLog, beanName, methodName, method, uri, Response.INTERNAL_SERVER_ERROR, remoteAddr, localAddr, String.format("%1$.3f", 0.00), queryString, ex);
+        String msg = ex.getCause() == null ? ex.getMessage(): ex.getCause().getMessage();
+        logger.error(outputLog, beanName, methodName, method, uri, Response.INTERNAL_SERVER_ERROR, remoteAddr, localAddr, String.format("%1$.3f", 0.00), queryString, msg);
     }
 
 }

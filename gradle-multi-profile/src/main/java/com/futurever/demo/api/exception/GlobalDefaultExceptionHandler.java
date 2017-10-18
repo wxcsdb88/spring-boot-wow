@@ -30,16 +30,16 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.net.URLDecoder;
 
-import static com.futurever.core.utils.net.IpUtils.getLocalRealIp;
 import static com.futurever.demo.api.utils.IpUtils.getClientAddr;
 
 /**
  * description: 全局异常参数格式化处理
  *
- * @author : wxcsdb88
- * @since : 2017/10/10 15:20
+ * @author wxcsdb88
+ * @since 2017/10/10 15:20
  */
 @RestController
 @ControllerAdvice
@@ -50,6 +50,7 @@ public class GlobalDefaultExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     public ResponseData defaultErrorHandler(HttpServletRequest request, HttpServletResponse response, Exception ex) throws Exception {
         ResponseData responseData = new ResponseData();
+        RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
         String queryString = request.getQueryString();
         if (queryString != null && !"".equals(queryString)) {
             queryString = URLDecoder.decode(queryString, "UTF-8");
@@ -58,22 +59,23 @@ public class GlobalDefaultExceptionHandler {
         String remoteAddr = getClientAddr(request);
         String token = request.getHeader("token");
         String method = request.getMethod();
-        String output_log = "defaultErrorHandler [method={} url={}  code={} from={} to={} cost={}ms parameters=({})] msg=({})";
-        logger.error(output_log, method, url, response.getStatus(), remoteAddr, getLocalRealIp(), String.format("%1$.3f", 0.00), queryString, ex);
+        String outputLog = "defaultErrorHandler [method={} url={}  code={} from={} to={} cost={}ms parameters=({})] msg=({})";
+        String msg = ex.getCause() == null ? ex.getMessage(): ex.getCause().getMessage();
+        logger.error(outputLog, method, url, response.getStatus(), remoteAddr, requestDO.getLocalAddr(), String.format("%1$.3f", 0.00), queryString, msg);
 
         if (ex instanceof org.springframework.web.servlet.NoHandlerFoundException) {
             responseData.setCode(Response.NO_HANDLER_FOUND_EXCEPTION);
-            String out_info = "No handler found for %s %s";
-            responseData.setMsg(String.format(out_info, method, url));
+            String outInfo = "No handler found for %s %s";
+            responseData.setMsg(String.format(outInfo, method, url));
         } else if (ex instanceof NullPointerException) {
             responseData.setCode(Response.INTERNAL_SERVER_ERROR);
-            String out_info = "Error null value for  %s %s";
-            responseData.setMsg(String.format(out_info, method, url));
+            String outInfo = "Error null value for  %s %s";
+            responseData.setMsg(String.format(outInfo, method, url));
         } else if (ex instanceof org.springframework.web.bind.MissingServletRequestParameterException) {
             // required parameter in spring annotation
             responseData.setCode(Response.INVALID_PARAMETER);
-            String out_info = ex.getMessage();
-            responseData.setMsg(String.format(out_info, ex.getMessage() == null ? "" : ex.getMessage()));
+            String outInfo = ex.getMessage();
+            responseData.setMsg(String.format(outInfo, ex.getMessage() == null ? "" : ex.getMessage()));
         } else if (ex instanceof org.springframework.web.HttpRequestMethodNotSupportedException) {
             responseData.setCode(Response.METHOD_ERROR);
             responseData.setMsg(ex.getMessage() == null ? "" : ex.getMessage());
@@ -83,13 +85,13 @@ public class GlobalDefaultExceptionHandler {
             responseData.setMsg(ex.getMessage() == null ? "" : ex.getMessage());
         } else {
             responseData.setCode(Response.INTERNAL_SERVER_ERROR);
-            String out_info = "service error with message: %s";
+            String outInfo = "service error with message: %s";
             responseData.setMsg(ex.getMessage());
         }
         return responseData;
     }
 
-    /*************************************  DefaultHandlerExceptionResolver start ***********************************************/
+    // *********************************************** DefaultHandlerExceptionResolver start ***********************************************
     /**
      * HTTP HttpRequestMethodNotSupportedException
      * 请求方法不匹配
@@ -388,11 +390,18 @@ public class GlobalDefaultExceptionHandler {
         return responseData;
     }
 
-    /*************************************  DefaultHandlerExceptionResolver end ***********************************************/
-    //参数类型不匹配
+    // *********************************************** DefaultHandlerExceptionResolver end ***********************************************
+
+    /**
+     * MethodArgumentTypeMismatchException
+     *
+     * @param request {@link HttpServletRequest}
+     * @param ex      {@link MethodArgumentTypeMismatchException}
+     * @return {@link ResponseData}
+     */
     @ExceptionHandler({MethodArgumentTypeMismatchException.class})
     @ResponseBody
-    public ResponseData methodArgumentTypeMismatchExceptionHandler(HttpServletRequest request, HttpServletResponse response, MethodArgumentTypeMismatchException ex) {
+    public ResponseData methodArgumentTypeMismatchExceptionHandler(HttpServletRequest request, MethodArgumentTypeMismatchException ex) {
         ResponseData responseData = new ResponseData<>();
         RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
         String resultMsg = String.format("参数类型不匹配, 参数 %s(%s), 类型应该为 %s", ex.getName(), ex.getValue(),
@@ -403,17 +412,42 @@ public class GlobalDefaultExceptionHandler {
         return responseData;
     }
 
+    /**
+     * IllegalArgumentException
+     *
+     * @param request {@link HttpServletRequest}
+     * @param ex      {@link IllegalArgumentException}
+     * @return {@link ResponseData}
+     */
     @ExceptionHandler({IllegalArgumentException.class})
     @ResponseBody
-    public ResponseData illegalArgumentException(HttpServletRequest request, HttpServletResponse response, IllegalArgumentException ex) {
+    public ResponseData illegalArgumentExceptionHandler(HttpServletRequest request, HttpServletResponse response, IllegalArgumentException ex) {
         ResponseData responseData = new ResponseData<>();
         RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
         String resultMsg = String.format("非法参数 %s", ex.getMessage());
-        String outputLog = "methodArgumentTypeMismatchExceptionHandler [method={} url={}  code={} from={} to={} parameters=({}) msg=({})]";
+        String outputLog = "illegalArgumentExceptionHandler [method={} url={}  code={} from={} to={} parameters=({}) msg=({})]";
         logger.error(outputLog, requestDO.getMethod(), requestDO.getRequestURL(), Response.ERROR, requestDO.getClientAddr(), requestDO.getLocalAddr(), requestDO.getQueryString(), resultMsg);
         responseData.setError(Response.INVALID_PARAMETER, resultMsg);
         return responseData;
     }
 
+    /**
+     * IOException
+     *
+     * @param request {@link HttpServletRequest}
+     * @param ex      {@link IOException}
+     * @return {@link ResponseData}
+     */
+    @ExceptionHandler({IOException.class})
+    @ResponseBody
+    public ResponseData ioExceptionHandler(HttpServletRequest request, HttpServletResponse response, IOException ex) {
+        ResponseData responseData = new ResponseData<>();
+        RequestDO requestDO = RequestUtils.getCurrentRequestDO(request);
+        String resultMsg = String.format("IO异常 %s", ex.getMessage());
+        String outputLog = "ioExceptionHandler [method={} url={}  code={} from={} to={} parameters=({}) msg=({})]";
+        logger.error(outputLog, requestDO.getMethod(), requestDO.getRequestURL(), Response.ERROR, requestDO.getClientAddr(), requestDO.getLocalAddr(), requestDO.getQueryString(), resultMsg);
+        responseData.setError(Response.INVALID_PARAMETER, resultMsg);
+        return responseData;
+    }
 
 }
